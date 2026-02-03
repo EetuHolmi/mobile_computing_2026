@@ -36,109 +36,39 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.animateContentSize
+import androidx.navigation.NavGraphBuilder
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
 
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            ComposeTutorialTheme {
-                Surface(modifier = Modifier.fillMaxSize()) {
-                    Conversation(SampleData.conversationSample)
+            val navController = rememberNavController()
+            NavHost(navController = navController, startDestination = "screen_B", builder = {
+                composable("screen_A"){
+                    ScreenA(navController)
+
                 }
-            }
+                composable("screen_B"){
+                    ScreenB(navController)
+                }
+
+            } )
         }
     }
+
+
 }
 
 
-data class Message(val author: String, val body: String)
 
-@Composable
-// MessageCard class from the tutorial https://developer.android.com/develop/ui/compose/tutorial
-fun MessageCard(msg: Message) {
-    Row(modifier = Modifier.padding(all = 8.dp)) {
-        Image(
-            painter = painterResource(R.drawable.head),
-            contentDescription = "profile pic",
-            modifier = Modifier
-                .size(40.dp)
-                .clip(CircleShape)
-                .border(1.5.dp, MaterialTheme.colorScheme.primary, CircleShape)
-        )
-        Spacer(modifier = Modifier.width(6.dp))
 
-        // expandable logic from the tutorial
-        var isExpanded by remember { mutableStateOf(false) }
 
-        val surfaceColor by animateColorAsState(
-            if (isExpanded) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surface,
-        )
 
-        Column(modifier = Modifier.clickable { isExpanded = !isExpanded }) {
-            Text(
-                text = msg.author,
-                color = MaterialTheme.colorScheme.secondary,
-                style = MaterialTheme.typography.titleSmall
-            )
 
-            Spacer(modifier = Modifier.height(4.dp))
 
-            Surface(
-                shape = MaterialTheme.shapes.medium,
-                shadowElevation = 2.dp,
-                color = surfaceColor,
-                modifier = Modifier.animateContentSize().padding(1.dp)
-
-            ) {
-                Text(
-                    text = msg.body,
-                    modifier = Modifier.padding(all = 4.dp),
-                    // If the message is expanded, we display all its content
-                    // otherwise we only display the first line
-                    maxLines = if (isExpanded) Int.MAX_VALUE else 2,
-                    style = MaterialTheme.typography.bodyMedium
-                )
-            }
-        }
-    }
-}
-
-@Composable
-fun Conversation(messages: List<Message>) {
-    LazyColumn {
-        items(messages) { message ->
-            MessageCard(message)
-        }
-    }
-}
-
-@Preview
-@Composable
-fun PreviewConversation() {
-    // Sample data from the tutorial
-    ComposeTutorialTheme {
-        Conversation(SampleData.conversationSample)
-    }
-}
-
-@Preview(name = "Light Mode")
-@Preview(
-    uiMode = Configuration.UI_MODE_NIGHT_YES,
-    showBackground = true,
-    name = "Dark Mode"
-)
-
-@Preview
-@Composable
-fun PreviewMessageCard() {
-    ComposeTutorialTheme {
-        Surface {
-            MessageCard(
-                msg = Message("Jaakko", "Hey, take a look at Jetpack Compose, it's great!")
-            )
-        }
-    }
-}
 
 

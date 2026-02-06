@@ -45,6 +45,7 @@ import androidx.navigation.compose.rememberNavController
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        // This tutorial used for navigation https://www.youtube.com/watch?v=wJKwsI5WUI4&t=460s
         setContent {
             val navController = rememberNavController()
             NavHost(navController = navController, startDestination = "screen_B", builder = {

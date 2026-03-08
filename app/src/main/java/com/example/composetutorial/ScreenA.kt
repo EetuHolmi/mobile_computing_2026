@@ -24,6 +24,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.foundation.border
 import androidx.compose.material3.MaterialTheme
 import android.content.res.Configuration
+import android.net.Uri
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.clickable
@@ -35,11 +36,36 @@ import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.material3.Button
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import androidx.room.Entity
+import androidx.room.PrimaryKey
+import coil.compose.AsyncImage
+import com.example.composetutorial.viewmodel.MessageViewModel
+import java.io.File
 
 @Composable
 fun ScreenA(navController: NavController){
+
+    val context = LocalContext.current
+
+    var imageUri by remember { mutableStateOf<Uri?>(null) }
+
+    LaunchedEffect(Unit) {
+        val file = File(context.filesDir, "profile_picture.jpg")
+        if (file.exists()) {
+            imageUri = Uri.fromFile(file)
+        }
+    }
+
+    val viewModel: MessageViewModel = viewModel()
+    val messages by viewModel.messages.observeAsState((emptyList()))
+
+
     Column(
         modifier = Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -55,7 +81,7 @@ fun ScreenA(navController: NavController){
         ComposeTutorialTheme {
             Surface(modifier = Modifier.fillMaxSize()) {
                 Column {
-                    Conversation(SampleData.conversationSample)
+                    Conversation(messages, imageUri)
                 }
             }
         }
@@ -64,34 +90,45 @@ fun ScreenA(navController: NavController){
 
 }
 
-@Composable
-fun ScreenAa(){
-    Column(
-        modifier = Modifier.fillMaxSize(),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
-    ) {
-        Text("Screen Aa")
-        Button(onClick = {}) {
-            Text("Go to Screen B")
-        }
-    }
-}
+    @Entity
+    data class User(
+        @PrimaryKey(autoGenerate = true)
+        var id: Int = 0,
+        var userName: String
+    )
 
-    data class Message(val author: String, val body: String)
+    @Entity
+    data class Message(
+        @PrimaryKey(autoGenerate = true)
+        var id: Int = 0,
+        var author: String,
+        var body: String
+    )
+
 
     @Composable
 // MessageCard class from the tutorial https://developer.android.com/develop/ui/compose/tutorial
-    fun MessageCard(msg: Message) {
+    fun MessageCard(msg: Message, uri: Uri?) {
         Row(modifier = Modifier.padding(all = 8.dp)) {
-            Image(
-                painter = painterResource(R.drawable.head),
-                contentDescription = "profile pic",
-                modifier = Modifier
-                    .size(40.dp)
-                    .clip(CircleShape)
-                    .border(1.5.dp, MaterialTheme.colorScheme.primary, CircleShape)
-            )
+            if (uri != null){
+                AsyncImage(
+                    model = uri,
+                    contentDescription = "profile pic",
+                    modifier = Modifier
+                        .size(40.dp)
+                        .clip(CircleShape)
+                        .border(1.5.dp, MaterialTheme.colorScheme.primary, CircleShape)
+                )
+            }else {
+                Image(
+                    painter = painterResource(R.drawable.head),
+                    contentDescription = "profile pic",
+                    modifier = Modifier
+                        .size(40.dp)
+                        .clip(CircleShape)
+                        .border(1.5.dp, MaterialTheme.colorScheme.primary, CircleShape)
+                )
+            }
             Spacer(modifier = Modifier.width(6.dp))
 
             // expandable logic from the tutorial
@@ -133,10 +170,10 @@ fun ScreenAa(){
     }
 
 @Composable
-fun Conversation(messages: List<Message>) {
+fun Conversation(messages: List<Message>, uri: Uri?) {
     LazyColumn {
         items(messages) { message ->
-            MessageCard(message)
+            MessageCard(message, uri)
         }
     }
 }

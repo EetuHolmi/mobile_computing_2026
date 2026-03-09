@@ -74,4 +74,6 @@ dependencies {
     // See Add the KSP plugin to your project
     ksp("androidx.room:room-compiler:$room_version")
 
+    implementation("com.google.accompanist:accompanist-permissions:0.33.1-alpha")
+
 }

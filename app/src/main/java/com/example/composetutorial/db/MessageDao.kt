@@ -14,7 +14,7 @@ interface MessageDao {
     fun getAllMessages() : LiveData<List<Message>>
 
     @Insert
-    fun addMessage(message: Message)
+    suspend fun addMessage(message: Message)
 
     @Query("SELECT author FROM Message LIMIT 1")
     fun getName(): LiveData<String>

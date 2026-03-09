@@ -21,4 +21,14 @@ class MessageViewModel(application: Application) : AndroidViewModel(application)
     }
 
     val username: LiveData<String> = dao.getName()
+
+    fun addMessage(message: Message){
+        viewModelScope.launch {
+            dao.addMessage(message)
+        }
+    }
+
+
+
+
 }
